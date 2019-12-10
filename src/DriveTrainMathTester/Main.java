@@ -1,7 +1,7 @@
 package DriveTrainMathTester;
 
 public class Main {
-    private static int mode=0;
+    private static int mode=1;
     private static Xbox xboxController=new Xbox();
     public static void main(String[] args)
     {
@@ -36,18 +36,67 @@ public class Main {
     {
         switch(mode)
         {
-            case 0:
+            case 0: //v1_Fail
                 //scale times 1/Math.max(xBoxController.getX(), invert());
                 if (xboxController.getX() < 0 && side == 0) {
                     return invert0() * scale0();
                 }
                 return Math.copySign(xboxController.getX() * scale0(), xboxController.getY());
+            case 1:
+                double refAngle=Math.atan(Math.abs(xboxController.getY())/Math.abs(xboxController.getX()));
+                //gives every first quadrant result
+                double preProcessLeft= dist() * 1;
+                double preProcessRight= dist() * (4 * refAngle / Math.PI - 1);
+                int quadrant=getQuadrant();
+                if(quadrant == 2 || quadrant == 3)
+                {
+                    double temp=preProcessLeft;
+                    preProcessLeft=preProcessRight;
+                    preProcessRight=temp;
+                }
+                if(quadrant == 3 || quadrant == 4)
+                {
+                    preProcessLeft *= -1;
+                    preProcessRight *= -1;
+                }
             default:
                 System.out.println("Invalid speed mode");
                 return 0;
         }
     }
 
+    //gets quadrant of joystick
+    private static int getQuadrant()
+    {
+        int quad;
+        if(xboxController.getX()>=0)
+        {
+            quad=1; //or 4
+        }
+        else
+        {
+            quad=2; //or 3
+        }
+        if(xboxController.getY()<=0)
+        {
+            if(quad==1)
+            {
+                return 4;
+            }
+            return 3;
+        }
+        return quad;
+    }
+
+    //Returns distance from (0, 0) of the controller. Used to scale end values
+    private static double dist()
+    {
+        return Math.sqrt(Math.pow(xboxController.getX(), 2) + Math.pow(xboxController.getY(), 2));
+    }
+
+
+
+    //dumped from v1_Fail
     private static double invert0()
     {
         return Math.copySign(currentMaxDist()-Math.abs(xboxController.getX()), xboxController.getX());
@@ -59,12 +108,6 @@ public class Main {
 
     {
         return dist() * (currentMaxDist() / higherXVal0());
-    }
-
-    //Returns distance from (0, 0) of the controller
-    private static double dist()
-    {
-        return Math.sqrt(Math.pow(xboxController.getX(), 2) + Math.pow(xboxController.getY(), 2));
     }
 
     private static double currentMaxDist()
