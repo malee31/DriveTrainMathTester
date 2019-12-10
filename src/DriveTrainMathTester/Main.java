@@ -1,6 +1,7 @@
 package DriveTrainMathTester;
 
 public class Main {
+    private static int mode=0;
     private static Xbox xboxController=new Xbox();
     public static void main(String[] args)
     {
@@ -11,8 +12,8 @@ public class Main {
         test(0, 1);
         test(-1,0);
         test(0,-1);
-        test(0.5,0.5);
-        test(-0.5,0.5);
+        test(0.5,0.35);
+        test(-0.35,0.5);
 
     }
 
@@ -33,24 +34,31 @@ public class Main {
 
     public static double getDriveSpeed(int side)
     {
-        //scale times 1/Math.max(xBoxController.getX(), invert());
-        if(xboxController.getX()>0 && side==1)
+        switch(mode)
         {
-            return invert()*scale();
+            case 0:
+                //scale times 1/Math.max(xBoxController.getX(), invert());
+                if (xboxController.getX() < 0 && side == 0) {
+                    return invert0() * scale0();
+                }
+                return Math.copySign(xboxController.getX() * scale0(), xboxController.getY());
+            default:
+                System.out.println("Invalid speed mode");
+                return 0;
         }
-        return Math.copySign(xboxController.getX()*scale(), xboxController.getY());
     }
 
-    public static double invert()
+    public static double invert0()
     {
         return Math.copySign(currentMaxDist()-Math.abs(xboxController.getX()), xboxController.getX());
     }
 
     //returns the value used to scale each value: distance from center times (maxDist divided by higher value in order to scale to 1:x ratio)
     //Always >=0
-    public static double scale()
+    public static double scale0()
+
     {
-        return dist() * (currentMaxDist() / higherXVal());
+        return dist() * (currentMaxDist() / higherXVal0());
     }
 
     //Returns distance from (0, 0) of the controller
@@ -64,8 +72,8 @@ public class Main {
         return Math.sqrt(1-Math.pow(xboxController.getY(), 2));
     }
 
-    public static double higherXVal()
+    public static double higherXVal0()
     {
-        return Math.max(Math.abs(xboxController.getX()), Math.abs(invert()));
+        return Math.max(Math.abs(xboxController.getX()), Math.abs(invert0()));
     }
 }
