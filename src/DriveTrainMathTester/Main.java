@@ -43,9 +43,33 @@ public class Main {
                 }
                 return Math.copySign(xboxController.getX() * scale0(), xboxController.getY());
             case 1:
-                double refAngle=Math.atan(Math.abs(xboxController.getY())/Math.abs(xboxController.getX()));
                 //gives every first quadrant result
-                double preProcessLeft= dist() * 1;
+                double refAngle=Math.atan(Math.abs(xboxController.getY())/Math.abs(xboxController.getX()));
+                double result=dist();
+                if(side == 1)
+                {
+                    result *= (4 * refAngle / Math.PI - 1);
+                }
+                int quadrant=getQuadrant();
+                if(quadrant == 2 || quadrant == 3)
+                {
+                    if(side == 1)
+                    {
+                        result=dist();
+                    }
+                    else
+                    {
+                        result *= (4 * refAngle / Math.PI - 1);
+                    }
+                }
+                if(quadrant == 3 || quadrant == 4)
+                {
+                    result *= -1;
+                }
+                return result;
+
+                /* Code drafting. Refactored above.
+                double preProcessLeft= dist();
                 double preProcessRight= dist() * (4 * refAngle / Math.PI - 1);
                 int quadrant=getQuadrant();
                 if(quadrant == 2 || quadrant == 3)
@@ -58,7 +82,7 @@ public class Main {
                 {
                     preProcessLeft *= -1;
                     preProcessRight *= -1;
-                }
+                }*/
             default:
                 System.out.println("Invalid speed mode");
                 return 0;
