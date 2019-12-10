@@ -17,13 +17,13 @@ public class Main {
 
     }
 
-    public static void test(double x, double y)
+    private static void test(double x, double y)
     {
         xboxController.setPos(x, y);
         printCurrent();
     }
 
-    public static void printCurrent()
+    private static void printCurrent()
     {
         System.out.println("XBox Values: ("+xboxController.getX()+", "+xboxController.getY()+")");
         System.out.println("Drivetrain motors: ("+getDriveSpeed(0)+", "+getDriveSpeed(1)+")");
@@ -32,7 +32,7 @@ public class Main {
 
 
 
-    public static double getDriveSpeed(int side)
+    private static double getDriveSpeed(int side)
     {
         switch(mode)
         {
@@ -48,31 +48,31 @@ public class Main {
         }
     }
 
-    public static double invert0()
+    private static double invert0()
     {
         return Math.copySign(currentMaxDist()-Math.abs(xboxController.getX()), xboxController.getX());
     }
 
     //returns the value used to scale each value: distance from center times (maxDist divided by higher value in order to scale to 1:x ratio)
     //Always >=0
-    public static double scale0()
+    private static double scale0()
 
     {
         return dist() * (currentMaxDist() / higherXVal0());
     }
 
     //Returns distance from (0, 0) of the controller
-    public static double dist()
+    private static double dist()
     {
         return Math.sqrt(Math.pow(xboxController.getX(), 2) + Math.pow(xboxController.getY(), 2));
     }
 
-    public static double currentMaxDist()
+    private static double currentMaxDist()
     {
         return Math.sqrt(1-Math.pow(xboxController.getY(), 2));
     }
 
-    public static double higherXVal0()
+    private static double higherXVal0()
     {
         return Math.max(Math.abs(xboxController.getX()), Math.abs(invert0()));
     }
