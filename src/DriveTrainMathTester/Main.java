@@ -5,16 +5,19 @@ public class Main {
     private static Xbox xboxController=new Xbox();
     public static void main(String[] args)
     {
-        test(0,0);
-        test(1,1);
-        test(-1,-1);
-        test(1,0);
-        test(0, 1);
-        test(-1,0);
-        test(0,-1);
-        test(0.5,0.35);
-        test(-0.35,0.5);
+        for(int i=0; i<=360; i+=10)
+        {
+            double radAngle=Math.toRadians(i);
+            double x=Math.cos(radAngle);
+            double y=Math.sin(radAngle);
+            System.out.print(i + "degrees: ");
+            test(x, y);
+        }
+    }
 
+    private static double findComponent(double length, double component1)
+    {
+        return Math.sqrt(Math.pow(length, 2) - Math.pow(component1, 2));
     }
 
     private static void test(double x, double y)
@@ -30,8 +33,6 @@ public class Main {
         System.out.println();
     }
 
-
-
     private static double getDriveSpeed(int side)
     {
         switch(mode)
@@ -43,73 +44,45 @@ public class Main {
                 }
                 return Math.copySign(xboxController.getX() * scale0(), xboxController.getY());
             case 1:
-                //gives every first quadrant result
-                double refAngle=Math.atan(Math.abs(xboxController.getY())/Math.abs(xboxController.getX()));
-                double result=dist();
-                if(side == 1)
-                {
-                    result *= (4 * refAngle / Math.PI - 1);
-                }
+                //gets quadrant joystick is currently in (1, 2, 3, 4)
                 int quadrant=getQuadrant();
-                if(quadrant == 2 || quadrant == 3)
+                //reference angle
+                double refAngle=getRefAngle();
+                //getting default result for right side quadrant 1
+                double result=refAngle / (Math.PI / 2) - 1; //Gives range of -1 to 1 CCW
+                if(side == 1 && (quadrant == 2 || quadrant == 4))
                 {
-                    if(side == 1)
-                    {
-                        result=dist();
-                    }
-                    else
-                    {
-                        result *= (4 * refAngle / Math.PI - 1);
-                    }
+                    result = 1;
                 }
-                if(quadrant == 3 || quadrant == 4)
-                {
-                    result *= -1;
-                }
-                return result;
-
-                /* Code drafting. Refactored above.
-                double preProcessLeft= dist();
-                double preProcessRight= dist() * (4 * refAngle / Math.PI - 1);
-                int quadrant=getQuadrant();
-                if(quadrant == 2 || quadrant == 3)
-                {
-                    double temp=preProcessLeft;
-                    preProcessLeft=preProcessRight;
-                    preProcessRight=temp;
-                }
-                if(quadrant == 3 || quadrant == 4)
-                {
-                    preProcessLeft *= -1;
-                    preProcessRight *= -1;
-                }*/
+                return Math.copySign(dist() * result, xboxController.getY()); //scale end result
             default:
-                System.out.println("Invalid speed mode");
+                System.out.println("Invalid drive mode");
                 return 0;
         }
     }
 
-    //gets quadrant of joystick
+    //gets current quadrant of joystick
     private static int getQuadrant()
     {
-        int quad;
-        if(xboxController.getX()>=0)
+        if(xboxController.getX() >= 0)
         {
-            quad=1; //or 4
-        }
-        else
-        {
-            quad=2; //or 3
-        }
-        if(xboxController.getY()<=0)
-        {
-            if(quad==1)
+            if(xboxController.getY() > 0)
             {
-                return 4;
+                return 1;
             }
-            return 3;
+            return 4;
         }
-        return quad;
+        else if(xboxController.getY() > 0)
+        {
+            return 2;
+        }
+        return 3;
+    }
+
+    //returns reference angle of Joystick from 0 to Pi/2
+    private static double getRefAngle()
+    {
+        return Math.abs(Math.atan(xboxController.getY() / xboxController.getX()));
     }
 
     //Returns distance from (0, 0) of the controller. Used to scale end values
@@ -129,7 +102,6 @@ public class Main {
     //returns the value used to scale each value: distance from center times (maxDist divided by higher value in order to scale to 1:x ratio)
     //Always >=0
     private static double scale0()
-
     {
         return dist() * (currentMaxDist() / higherXVal0());
     }
