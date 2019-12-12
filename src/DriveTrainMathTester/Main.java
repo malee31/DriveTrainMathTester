@@ -63,15 +63,16 @@ public class Main {
                 int quadrant=getQuadrant();
                 //reference angle
                 double refAngle=getRefAngle();
+                
                 //getting default result for right side quadrant 1
-                double result=refAngle / (Math.PI / 2) - 1; //Gives range of -1 to 1 CCW
+                double result= 2 * refAngle / (Math.PI / 2) - 1; //Gives range of -1 to 1 CCW
                 System.out.println(quadrant);
                 if(side == 1 && (quadrant == 2 || quadrant == 4))
                 {
                     result = Math.copySign(1, result);
                 }
                 //Still need to fix signs since copy sign doesn't work
-                return dist() * result; //scale end result
+                return finalRound(dist() * result); //scale end result. Rounding is just for my own sanity
             default:
                 System.out.println("Invalid drive mode");
                 return 0;
@@ -108,7 +109,19 @@ public class Main {
         return Math.sqrt(Math.pow(xboxController.getX(), 2) + Math.pow(xboxController.getY(), 2));
     }
 
-
+    private static double finalRound(double roundee)
+    {
+        float threshold=0.0001;
+        if(1-Math.abs(roundee)<threshold)
+        {
+            return Math.copySign(1, roundee);
+        }
+        else if(Math.abs(roundee)<threshold)
+        {
+        return Math.copySign(0, roundee);
+        }
+        return roundee;
+    }
 
     //dumped from v1_Fail
     private static double invert0()
