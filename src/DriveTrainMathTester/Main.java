@@ -1,23 +1,37 @@
 package DriveTrainMathTester;
 
 public class Main {
-    private static int mode=1;
     private static Xbox xboxController=new Xbox();
     public static void main(String[] args)
     {
-        for(int i=0; i<=360; i+=10)
+//        for(int i=0; i<=360; i+=10)
+//        {
+//            double radAngle=Math.toRadians(i);
+//            double x=Math.cos(radAngle);
+//            double y=Math.sin(radAngle);
+//            System.out.print(i + "degrees: ");
+//            test(x, y);
+//        }
+        for(int i=0; i<=360; i+=45)
         {
+            /*
+            Expected Output:
+                1,-1
+                1,0
+                1,1
+                0,1
+                -1,1
+                -1,0
+                -1,-1
+                0,-1
+                1,-1
+            */
             double radAngle=Math.toRadians(i);
             double x=Math.cos(radAngle);
             double y=Math.sin(radAngle);
-            System.out.print(i + "degrees: ");
+            System.out.print(i + " degrees: ");
             test(x, y);
         }
-    }
-
-    private static double findComponent(double length, double component1)
-    {
-        return Math.sqrt(Math.pow(length, 2) - Math.pow(component1, 2));
     }
 
     private static void test(double x, double y)
@@ -35,6 +49,7 @@ public class Main {
 
     private static double getDriveSpeed(int side)
     {
+        int mode = 1;
         switch(mode)
         {
             case 0: //v1_Fail
@@ -50,18 +65,20 @@ public class Main {
                 double refAngle=getRefAngle();
                 //getting default result for right side quadrant 1
                 double result=refAngle / (Math.PI / 2) - 1; //Gives range of -1 to 1 CCW
+                System.out.println(quadrant);
                 if(side == 1 && (quadrant == 2 || quadrant == 4))
                 {
-                    result = 1;
+                    result = Math.copySign(1, result);
                 }
-                return Math.copySign(dist() * result, xboxController.getY()); //scale end result
+                //Still need to fix signs since copy sign doesn't work
+                return dist() * result; //scale end result
             default:
                 System.out.println("Invalid drive mode");
                 return 0;
         }
     }
 
-    //gets current quadrant of joystick
+    //gets current quadrant of joystick quadrants don't include the shared minimum border, only the maximum. Example: Q1 => (0, 90]
     private static int getQuadrant()
     {
         if(xboxController.getX() >= 0)
@@ -96,17 +113,17 @@ public class Main {
     //dumped from v1_Fail
     private static double invert0()
     {
-        return Math.copySign(currentMaxDist()-Math.abs(xboxController.getX()), xboxController.getX());
+        return Math.copySign(currentMaxDist0()-Math.abs(xboxController.getX()), xboxController.getX());
     }
 
     //returns the value used to scale each value: distance from center times (maxDist divided by higher value in order to scale to 1:x ratio)
     //Always >=0
     private static double scale0()
     {
-        return dist() * (currentMaxDist() / higherXVal0());
+        return dist() * (currentMaxDist0() / higherXVal0());
     }
 
-    private static double currentMaxDist()
+    private static double currentMaxDist0()
     {
         return Math.sqrt(1-Math.pow(xboxController.getY(), 2));
     }
