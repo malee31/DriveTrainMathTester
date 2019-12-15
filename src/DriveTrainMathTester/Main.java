@@ -86,7 +86,7 @@ public class Main {
                 }
                 //Still need to fix signs since copy sign doesn't work
                 return finalRound(dist() * result); //scale end result. Rounding is just for my own sanity
-            case 1:
+            case 2:
 
             default:
                 System.out.println("Invalid drive mode");
