@@ -63,7 +63,7 @@ public class Main {
 
     private static double getDriveSpeed(int side)
     {
-        int mode = 1;
+        int mode = 2;
         switch(mode)
         {
             case 0: //v1_Fail
@@ -72,7 +72,7 @@ public class Main {
                     return invert0() * scale0();
                 }
                 return Math.copySign(xboxController.getX() * scale0(), xboxController.getY());
-            case 1:
+            case 1: //v2_Fail
                 //gets quadrant joystick is currently in (1, 2, 3, 4)
                 int quadrant=getQuadrant();
                 //reference angle
@@ -86,6 +86,8 @@ public class Main {
                 }
                 //Still need to fix signs since copy sign doesn't work
                 return finalRound(dist() * result); //scale end result. Rounding is just for my own sanity
+            case 1:
+
             default:
                 System.out.println("Invalid drive mode");
                 return 0;
