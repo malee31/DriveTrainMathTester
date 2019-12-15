@@ -4,34 +4,48 @@ public class Main {
     private static Xbox xboxController=new Xbox();
     public static void main(String[] args)
     {
-//        for(int i=0; i<=360; i+=10)
-//        {
-//            double radAngle=Math.toRadians(i);
-//            double x=Math.cos(radAngle);
-//            double y=Math.sin(radAngle);
-//            System.out.print(i + "degrees: ");
-//            test(x, y);
-//        }
-        for(int i=0; i<=360; i+=45)
+        //prints debug plots Left
+        for(int i=0; i<=360; i+=10)
         {
-            /*
-            Expected Output:
-                1,-1
-                1,0
-                1,1
-                0,1
-                -1,1
-                -1,0
-                -1,-1
-                0,-1
-                1,-1
-            */
             double radAngle=Math.toRadians(i);
             double x=Math.cos(radAngle);
             double y=Math.sin(radAngle);
-            System.out.print(i + " degrees: ");
-            test(x, y);
+            xboxController.setPos(x, y);
+            System.out.print("("+radAngle+", "+getDriveSpeed(0)+")");
         }
+        System.out.println();
+        //prints debug plots Right
+        //Good up until 180deg+
+        for(int i=0; i<=360; i+=10)
+        {
+            double radAngle=Math.toRadians(i);
+            double x=Math.cos(radAngle);
+            double y=Math.sin(radAngle);
+            xboxController.setPos(x, y);
+            System.out.print("("+radAngle+", "+getDriveSpeed(1)+")");
+        }
+        System.out.println();
+        //prints debug text
+//        for(int i=0; i<=360; i+=45)
+//        {
+//            /*
+//            Expected Output:
+//                1,-1
+//                1,0
+//                1,1
+//                0,1
+//                -1,1
+//                -1,0
+//                -1,-1
+//                0,-1
+//                1,-1
+//            */
+//            double radAngle=Math.toRadians(i);
+//            double x=Math.cos(radAngle);
+//            double y=Math.sin(radAngle);
+//            System.out.print(i + " degrees: ");
+//            test(x, y);
+//        }
     }
 
     private static void test(double x, double y)
@@ -66,10 +80,9 @@ public class Main {
                 
                 //getting default result for right side quadrant 1
                 double result= 2 * refAngle / (Math.PI / 2) - 1; //Gives range of -1 to 1 CCW
-                System.out.println(quadrant);
-                if(side == 1 && (quadrant == 2 || quadrant == 4))
+                if((side == 1 && (quadrant == 2 || quadrant == 4)) || (side == 0 && (quadrant == 1 || quadrant == 3)))
                 {
-                    result = Math.copySign(1, result);
+                    result = Math.copySign(1, xboxController.getY());
                 }
                 //Still need to fix signs since copy sign doesn't work
                 return finalRound(dist() * result); //scale end result. Rounding is just for my own sanity
@@ -111,7 +124,7 @@ public class Main {
 
     private static double finalRound(double roundee)
     {
-        float threshold=0.0001;
+        double threshold=0.0001;
         if(1-Math.abs(roundee)<threshold)
         {
             return Math.copySign(1, roundee);
