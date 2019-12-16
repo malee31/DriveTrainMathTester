@@ -95,7 +95,7 @@ public class Main {
                 result = refAngle / (Math.PI/4) - 1; //Gives range of -1 to 1 CCW
 
                 //Left side (quadrants 2 and 3)
-                if(side == 0 || quadrant == 2 || quadrant == 4)
+                if((side == 0 && quadrant != 2)|| quadrant == 4)
                 {
                     result *= -1;
                 }
