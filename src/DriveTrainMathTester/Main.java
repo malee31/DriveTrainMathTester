@@ -1,6 +1,7 @@
 package DriveTrainMathTester;
 
 public class Main {
+    private static boolean currentlyUp=true;
     private static Xbox xboxController=new Xbox();
     public static void main(String[] args)
     {
@@ -57,9 +58,9 @@ public class Main {
                 return Math.copySign(xboxController.getX() * scale0(), xboxController.getY());
             case 1: //v2_Fail
                 //gets quadrant joystick is currently in (1, 2, 3, 4)
-                quadrant=getQuadrant();
+                quadrant = getQuadrant();
                 //reference angle
-                refAngle=getRefAngle();
+                refAngle = getRefAngle();
 
                 //getting default result for right side quadrant 1
                 result= 2 * refAngle / (Math.PI / 2) - 1; //Gives range of -1 to 1 CCW
@@ -69,20 +70,18 @@ public class Main {
                 }
                 //Still need to fix signs since copy sign doesn't work
                 return finalRound(dist() * result); //scale end result. Rounding is just for my own sanity
-
-
-
-
             case 2:
                 quadrant = getQuadrant();
-                //insert 180deg mark if statements here
-
-                //convert reference angle from either 0->90deg or -90->0deg to all 0->90deg
-                refAngle = Math.abs((getRefAngle() + 90) % 90);
+                //insert 180deg mark if statements
+                if(xboxController.getY() == 0)
+                {
+                    return dist() * (currentlyUp ? 1 : -1);
+                }
 
                 //Quick answers for max throttle and invalid parameters
                 if((side == 0 && (quadrant == 1 || quadrant == 4)) || (side == 1 && (quadrant == 2 || quadrant == 3)))
                 {
+                    //returns scaled +1 or -1
                     return dist() * Math.copySign(1, xboxController.getY());
                 }
                 else if(side != 0 && side != 1)
@@ -91,14 +90,20 @@ public class Main {
                     return 0;
                 }
 
-                //default right side (quadrants 1 and 4)
-                result = refAngle / (Math.PI/4) - 1; //Gives range of -1 to 1 CCW
+                //convert reference angle from either 0->90deg or -90->0deg to all 0->90deg
+                refAngle = Math.abs((getRefAngle() + 90) % 90);
+
+                //default right side value(quadrants 1 and 4)
+                result = refAngle / (Math.PI / 4) - 1; //Gives range of -1 to 1 CCW
 
                 //Left side (quadrants 2 and 3)
                 if((side == 0 && quadrant != 2)|| quadrant == 4)
                 {
                     result *= -1;
                 }
+
+                //sets variable on whether up is the direction it is going
+                currentlyUp = (quadrant == 1 || quadrant == 2);
 
                 //finalize and scale based on joystick distance from center
                 return finalRound(dist() * result); //scale end result. Rounding is just for my own sanity
