@@ -4,42 +4,22 @@ public class Main {
     private static Xbox xboxController=new Xbox();
     public static void main(String[] args)
     {
-        //prints debug plots Left
-        for(int i=0; i<=360; i+=10)
+        //prints debug plots Left then Right
+        for(int side=0; side<2; side++)
         {
-            double radAngle=Math.toRadians(i);
-            double x=Math.cos(radAngle);
-            double y=Math.sin(radAngle);
-            xboxController.setPos(x, y);
-            System.out.print("("+radAngle+", "+getDriveSpeed(0)+")");
+            for(int i=0; i<=360; i+=10)
+            {
+                double radAngle=Math.toRadians(i);
+                double x=Math.cos(radAngle);
+                double y=Math.sin(radAngle);
+                xboxController.setPos(x, y);
+                System.out.print("("+radAngle+", "+getDriveSpeed(side)+")");
+            }
+            System.out.println();
         }
-        System.out.println();
-        //prints debug plots Right
-        //Good up until 180deg+
-        for(int i=0; i<=360; i+=10)
-        {
-            double radAngle=Math.toRadians(i);
-            double x=Math.cos(radAngle);
-            double y=Math.sin(radAngle);
-            xboxController.setPos(x, y);
-            System.out.print("("+radAngle+", "+getDriveSpeed(1)+")");
-        }
-        System.out.println();
         //prints debug text
 //        for(int i=0; i<=360; i+=45)
 //        {
-//            /*
-//            Expected Output:
-//                1,-1
-//                1,0
-//                1,1
-//                0,1
-//                -1,1
-//                -1,0
-//                -1,-1
-//                0,-1
-//                1,-1
-//            */
 //            double radAngle=Math.toRadians(i);
 //            double x=Math.cos(radAngle);
 //            double y=Math.sin(radAngle);
@@ -64,6 +44,9 @@ public class Main {
     private static double getDriveSpeed(int side)
     {
         int mode = 2;
+        int quadrant;
+        double refAngle;
+        double result;
         switch(mode)
         {
             case 0: //v1_Fail
@@ -74,20 +57,51 @@ public class Main {
                 return Math.copySign(xboxController.getX() * scale0(), xboxController.getY());
             case 1: //v2_Fail
                 //gets quadrant joystick is currently in (1, 2, 3, 4)
-                int quadrant=getQuadrant();
+                quadrant=getQuadrant();
                 //reference angle
-                double refAngle=getRefAngle();
-                
+                refAngle=getRefAngle();
+
                 //getting default result for right side quadrant 1
-                double result= 2 * refAngle / (Math.PI / 2) - 1; //Gives range of -1 to 1 CCW
+                result= 2 * refAngle / (Math.PI / 2) - 1; //Gives range of -1 to 1 CCW
                 if((side == 1 && (quadrant == 2 || quadrant == 4)) || (side == 0 && (quadrant == 1 || quadrant == 3)))
                 {
                     result = Math.copySign(1, xboxController.getY());
                 }
                 //Still need to fix signs since copy sign doesn't work
                 return finalRound(dist() * result); //scale end result. Rounding is just for my own sanity
-            case 2:
 
+
+
+
+            case 2:
+                quadrant = getQuadrant();
+                //insert 180deg mark if statements here
+
+                //convert reference angle from either 0->90deg or -90->0deg to all 0->90deg
+                refAngle = Math.abs((getRefAngle() + 90) % 90);
+
+                //Quick answers for max throttle and invalid parameters
+                if((side == 0 && (quadrant == 1 || quadrant == 4)) || (side == 1 && (quadrant == 2 || quadrant == 3)))
+                {
+                    return dist() * Math.copySign(1, xboxController.getY());
+                }
+                else if(side != 0 && side != 1)
+                {
+                    System.out.println("Invalid port/side number");
+                    return 0;
+                }
+
+                //default right side (quadrants 1 and 4)
+                result = refAngle / (Math.PI/4) - 1; //Gives range of -1 to 1 CCW
+
+                //Left side (quadrants 2 and 3)
+                if(side == 0 || quadrant == 2 || quadrant == 4)
+                {
+                    result *= -1;
+                }
+
+                //finalize and scale based on joystick distance from center
+                return finalRound(dist() * result); //scale end result. Rounding is just for my own sanity
             default:
                 System.out.println("Invalid drive mode");
                 return 0;
