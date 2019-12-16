@@ -73,7 +73,7 @@ public class Main {
             case 2:
                 quadrant = getQuadrant();
                 //insert 180deg mark if statements
-                if(xboxController.getY() == 0)
+                if(Math.abs(xboxController.getY()) <= Math.sin(Math.toRadians(7.5)))
                 {
                     return dist() * (currentlyUp ? 1 : -1);
                 }
